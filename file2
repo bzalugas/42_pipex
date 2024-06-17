@@ -1,0 +1,9 @@
+total 32
+-rw-r--r-- 1 bazaluga 2023_paris    55 Jun 17 15:15 file1
+-rw-r--r-- 1 bazaluga 2023_paris     0 Jun 17 16:30 file2
+drwxr-xr-x 3 bazaluga 2023_paris    91 Jun 17 15:36 include
+-rwxr-xr-x 1 bazaluga 2023_paris  2273 Jun 17 15:43 Makefile
+drwxr-xr-x 2 bazaluga 2023_paris    66 Jun 17 16:29 obj
+-rwxr-xr-x 1 bazaluga 2023_paris 16392 Jun 17 16:29 pipex
+-rw-r--r-- 1 bazaluga 2023_paris   879 Jun 17 15:08 README.org
+drwxr-xr-x 2 bazaluga 2023_paris    36 Jun 17 15:30 src
