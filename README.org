@@ -1,10 +1,10 @@
 * Pipex
 ** Steps
 - [ ] Check if infile can be read then open it
-- [ ] Check if outfile can be written to then open it
 - [ ] Get the path in envp, split it.
 - [ ] Redirect infile to stdin
 - [ ] Try to launch cmd1 with every path (or check with access): it will run it and stop process if the path is correct
+- [ ] Check if outfile can be written to then open it
 - [ ] Do the same with cmd2 but res cmd1 in stdin
 * Time spent
 ** IN PROGRESS Pipex
@@ -16,5 +16,7 @@
 *** CODE pipex program
 *** IN PROGRESS document, test, repo orga
 :LOGBOOK:
+CLOCK: [2024-06-18 Tue 18:12]--[2024-06-18 Tue 18:33] =>  0:21
+CLOCK: [2024-06-18 Tue 12:01]--[2024-06-18 Tue 12:17] =>  0:16
 CLOCK: [2024-06-17 Mon 15:08]--[2024-06-17 Mon 15:45] =>  0:37
 :END:
