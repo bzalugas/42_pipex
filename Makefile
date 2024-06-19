@@ -6,7 +6,7 @@
 #    By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/17 15:07:33 by bazaluga          #+#    #+#              #
-#    Updated: 2024/06/17 15:43:20 by bazaluga         ###   ########.fr        #
+#    Updated: 2024/06/19 13:18:49 by bazaluga         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -45,7 +45,6 @@ all:		$(NAME)
 $(OBJDIR):
 		mkdir -p $(OBJDIR)
 
--include	$(OBJ:.o=.d)
 
 $(OBJDIR)/%.o:	$(SRCDIR)/%.c Makefile | $(OBJDIR)
 		@printf $(GREEN)
@@ -69,6 +68,9 @@ $(NAME):	$(OBJ) $(MLX) $(LIBFT)
 
 bonus:		$(NAME)
 
+libft:		$(LIBFT)
+		@make -sC $(LIBFTDIR)
+
 clean:
 		@echo $(RED)"CLEANING OBJS"
 		rm -f $(OBJ)
@@ -87,4 +89,6 @@ fclean:		clean
 re:		fclean
 		@make all
 
-.PHONY:		all clean fclean re bonus
+-include	$(OBJ:.o=.d)
+
+.PHONY:		all clean fclean re bonus libft
