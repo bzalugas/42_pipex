@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 17:22:49 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/07 12:39:01 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/19 11:10:12 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include <limits.h>
-# include "ft_printf.h"
-# include "get_next_line.h"
+# include "libft/ft_printf.h"
+# include "libft/get_next_line.h"
 
 /*********************************** PART 1 ***********************************/
 int				ft_isalpha(int c);
