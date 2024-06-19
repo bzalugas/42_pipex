@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:11:46 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/19 13:58:12 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/19 14:23:53 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,11 @@ char	**get_paths(char *env[])
 	return (NULL);
 }
 
+int	run_cmd(int fd_in, char *cmd[], int fd_out, char *env[])
+{
+
+}
+
 int	run_cmd1(int fd[2], char *av[], char *env[])
 {
 	int		fd_infile;
@@ -38,13 +43,14 @@ int	run_cmd1(int fd[2], char *av[], char *env[])
 	char	**cmd_options;
 	char	*cmd;
 
-	(void)fd;
+	close(fd[0]);
 	if (access(av[1], F_OK | R_OK) == -1)
 		return (stop_perror(av[1], 0));
 	fd_infile = open(av[1], O_RDONLY);
 	if (fd_infile == -1)
 		return (stop_perror(av[1], 0));
 	dup2(fd_infile, STDIN_FILENO);
+	dup2(fd[1], STDOUT_FILENO);
 	paths = get_paths(env);
 	if (!paths)
 		return (stop_error("get_paths"));
@@ -55,11 +61,11 @@ int	run_cmd1(int fd[2], char *av[], char *env[])
 	while (paths[i])
 	{
 		cmd = ft_strjoin_free(ft_strjoin(paths[i], "/"), cmd_options[0], 1, 0);
-		execve(cmd, cmd_options, env);
-		free(cmd);
+		if (execve(cmd, cmd_options, env))
+			free(cmd);
 		i++;
 	}
-	stop_error(ft_strjoin("Command not found: ", cmd_options[0]));
+	stop_error(ft_strjoin(cmd_options[0], ": command not found"));
 	return (0);
 }
 
@@ -77,5 +83,14 @@ int	main(int ac, char *av[], char *env[])
 		stop_perror("Fork error", 0);
 	if (pid == 0)
 		run_cmd1(fd, av, env);
+	else
+	{
+		char buff[4096];
+		buff[4095] = '\0';
+		close(fd[1]);
+		read(fd[0], &buff, 4096);
+		close(fd[0]);
+		write(1, &buff, ft_strlen(buff));
+	}
 	return (0);
 }

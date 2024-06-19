@@ -17,7 +17,7 @@
 :END:
 *** CODING pipex program
 :LOGBOOK:
-CLOCK: [2024-06-19 Wed 12:13]
+CLOCK: [2024-06-19 Wed 12:13]--[2024-06-19 Wed 14:14] =>  2:01
 :END:
 *** IN PROGRESS document, test, repo orga
 :LOGBOOK:
