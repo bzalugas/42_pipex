@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:11:46 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/22 18:24:42 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/22 19:14:47 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ int	run_last(t_pipes *p, char *av[], char *env[])
 {
 	char	**cmd;
 
-	p->fd_out = open(av[1], O_WRONLY| O_CREAT | O_TRUNC, 0644);
+	p->fd_out = open(av[1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (p->fd_out == -1)
 		return (stop_perror(av[1], 0, p));
 	if (p->n_cmd % 2 == 0)
@@ -115,48 +115,69 @@ int	run_last(t_pipes *p, char *av[], char *env[])
 	return (run_cmd(p, cmd, env));
 }
 
+int	run_middle_cmds(t_pipes *p, char *av[], char *env[])
+{
+	int	i;
+	int	pid;
+	int	status;
+
+	i = 3;
+	while (av[i] && av[i + 1] && av[i + 2])
+	{
+		pid = fork();
+		if (pid == -1)
+			return (stop_perror("fork", 0, p));
+		if (pid == 0)
+		{
+			handle_pipe(p);
+			run_cmd(p, ft_split(av[i], ' '), env);
+		}
+		waitpid(pid, &status, 0);
+		/* if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) */
+		/* 	stop_error("Last command didn't worked", p); */
+		i++;
+		p->n_cmd++;
+	}
+	return (i);
+}
+
+int	run_all(t_pipes *p, char *av[], char *env[])
+{
+	int	pid;
+	int	i;
+	int	status;
+
+	pid = fork();
+	if (pid == -1)
+		return (stop_perror("First fork", 0, p));
+	if (pid == 0)
+		run_first(p, av, env);
+	waitpid(pid, &status, 0);
+	/* if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) */
+		/* end_pipex(p, 1); */
+	p->n_cmd++;
+	i = run_middle_cmds(p, av, env);
+	pid = fork();
+	if (pid == -1)
+		return (stop_perror("fork", 0, p));
+	if (pid == 0)
+		run_last(p, &av[i], env);
+	return (0);
+}
+
 int	main(int ac, char *av[], char *env[])
 {
-	pid_t	pid;
 	t_pipes	p;
-	/* int		i; */
 
 	p = (t_pipes){.n_cmd = 0, .paths = NULL};
-	if (ac != 5)
+	if (ac < 5)
 		stop_perror("Wrong arguments number", EINVAL, &p);
 	p.paths = get_paths(env);
 	if (!p.paths)
 		return (stop_error("get_paths", &p));
 	if (pipe(p.fd1) == -1 || pipe(p.fd2) == -1)
 		return (stop_perror("Pipes openning", 0, &p));
-	pid = fork();
-	if (pid == -1)
-		return (stop_perror("First fork", 0, &p));
-	if (pid == 0)
-		run_first(&p, av, env);
-	else
-	{
-		p.n_cmd++;
-		/* waitpid(pid, NULL, 0); */
-		/* i = 3; */
-		/* while (av[i] && av[i + 1] && av[i + 2]) */
-		/* { */
-		/* 	pid = fork(); */
-		/* 	if (pid == -1) */
-		/* 		return (stop_perror("fork", 0, &p)); */
-		/* 	if (pid == 0) */
-		/* 		run_cmd(&p, ft_split(av[i], ' '), env); */
-		/* 	else */
-		/* 		waitpid(pid, NULL, 0); */
-		/* } */
-		pid = fork();
-		if (pid == -1)
-			return (stop_perror("fork", 0, &p));
-		if (pid == 0)
-			run_last(&p, &av[3], env);
-		waitpid(pid, NULL, WNOHANG);
-		/* wait(NULL); */
-	}
+	run_all(&p, av, env);
 	end_pipex(&p, EXIT_SUCCESS);
 	return (0);
 }
