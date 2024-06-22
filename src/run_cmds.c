@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/22 19:33:11 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/22 21:30:48 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ int	run_cmd(t_pipes *p, char *cmd[], char *env[])
 	dup2(p->fd_out, STDOUT_FILENO);
 	close(p->fd_in);
 	close(p->fd_out);
+
 	i = 0;
 	while (p->paths[i])
 	{
@@ -42,16 +43,25 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 {
 	char	**cmd_options;
 
-	if (access(av[1], F_OK | R_OK) == -1)
-		return (stop_child_perror(av[1], 0));
-	p->fd_in = open(av[1], O_RDONLY);
-	if (p->fd_in == -1)
-		return (stop_child_perror(av[1], 0));
+	if (!p->here_doc)
+	{
+		if (access(av[1], F_OK | R_OK) == -1)
+			return (stop_child_perror(av[1], 0));
+		p->fd_in = open(av[1], O_RDONLY);
+		if (p->fd_in == -1)
+			return (stop_child_perror(av[1], 0));
+		cmd_options = ft_split(av[2], ' ');
+	}
+	else
+	{
+		p->fd_in = p->fd_hd[0];
+		close(p->fd_hd[1]);
+		cmd_options = ft_split(av[3], ' ');
+	}
 	p->fd_out = p->fd2[1];
 	close(p->fd1[0]);
 	close(p->fd1[1]);
 	close(p->fd2[0]);
-	cmd_options = ft_split(av[2], ' ');
 	if (!cmd_options)
 		return (stop_error("split command", p));
 	return (run_cmd(p, cmd_options, env));
@@ -61,7 +71,10 @@ int	run_last(t_pipes *p, char *av[], char *env[])
 {
 	char	**cmd;
 
-	p->fd_out = open(av[1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (!p->here_doc)
+		p->fd_out = open(av[1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	else
+		p->fd_out = open(av[1], O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (p->fd_out == -1)
 		return (stop_perror(av[1], 0, p));
 	if (p->n_cmd % 2 == 0)
@@ -88,7 +101,7 @@ int	run_middle_cmds(t_pipes *p, char *av[], char *env[])
 	int	pid;
 	int	status;
 
-	i = 3;
+	i = 3 + p->here_doc;
 	while (av[i] && av[i + 1] && av[i + 2])
 	{
 		pid = fork();
@@ -119,6 +132,8 @@ int	run_all(t_pipes *p, char *av[], char *env[])
 		return (stop_perror("First fork", 0, p));
 	if (pid == 0)
 		run_first(p, av, env);
+	if (pid != 0 && p->here_doc)
+		get_here_doc(p, av);
 	waitpid(pid, &status, 0);
 	/* if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) */
 		/* end_pipex(p, 1); */

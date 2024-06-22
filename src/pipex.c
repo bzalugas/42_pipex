@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:11:46 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/22 19:33:41 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/22 20:45:17 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,12 @@ int	main(int ac, char *av[], char *env[])
 		return (stop_error("get_paths", &p));
 	if (pipe(p.fd1) == -1 || pipe(p.fd2) == -1)
 		return (stop_perror("Pipes openning", 0, &p));
+	if (!ft_strncmp(av[1], "here_doc", 8))
+	{
+		p.here_doc = true;
+		if (pipe(p.fd_hd) == -1)
+			stop_perror("Pipe here_doc", 0, &p);
+	}
 	run_all(&p, av, env);
 	end_pipex(&p, EXIT_SUCCESS);
 	return (0);
