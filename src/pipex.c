@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:11:46 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/20 19:38:05 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/22 18:24:42 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,114 +31,132 @@ char	**get_paths(char *env[])
 	return (NULL);
 }
 
-int	run_cmd(int fd[2], char **paths, char *cmd[], char *env[])
+int	run_cmd(t_pipes *p,  char *cmd[], char *env[])
 {
-	/* size_t	i; */
-	/* char	*abs_cmd; */
+	size_t	i;
+	char	*abs_cmd;
 
-	(void)paths;
-	(void)cmd;
-	(void)env;
-	dup2(fd[0], STDIN_FILENO);
-	dup2(fd[1], STDOUT_FILENO);
-
-
-
-//PROBLEM HERE : Process is blocked at second fork when trying to read fd[0] or STDIN
-
-
-
-
-	/* char *line = get_next_line(STDIN_FILENO); */
-	/* ft_putendl_fd(line, 2); */
-	return (0);
-	/* i = 0; */
-	/* while (paths[i]) */
-	/* { */
-	/* 	abs_cmd = ft_strjoin_free(ft_strjoin(paths[i], "/"), cmd[0], 1, 0); */
-	/* 	if (execve(abs_cmd, cmd, env)) */
-	/* 		free(abs_cmd); */
-	/* 	i++; */
-	/* } */
-	/* return (stop_error(ft_strjoin(cmd[0], ": command not found"))); */
+	dup2(p->fd_in, STDIN_FILENO);
+	dup2(p->fd_out, STDOUT_FILENO);
+	close(p->fd_in);
+	close(p->fd_out);
+	i = 0;
+	while (p->paths[i])
+	{
+		abs_cmd = ft_strjoin_free(ft_strjoin(p->paths[i], "/"), cmd[0], 1, 0);
+		if (execve(abs_cmd, cmd, env))
+			free(abs_cmd);
+		else
+			write(2, "here\n", 5);
+		i++;
+	}
+	return (stop_error(ft_strjoin(cmd[0], ": command not found"), p));
 }
 
-int	run_first(int fd[2], char **paths, char *av[], char *env[])
+void	handle_pipe(t_pipes *p)
 {
-	int		fd_infile;
+	if (p->n_cmd % 2 == 0)
+	{
+		p->fd_in = p->fd1[0];
+		p->fd_out = p->fd2[1];
+		close(p->fd1[1]);
+		close(p->fd2[0]);
+	}
+	else
+	{
+		p->fd_in = p->fd2[0];
+		p->fd_out = p->fd1[1];
+		close(p->fd1[0]);
+		close(p->fd2[1]);
+	}
+}
+
+int	run_first(t_pipes *p, char *av[], char *env[])
+{
 	char	**cmd_options;
 
 	if (access(av[1], F_OK | R_OK) == -1)
-		return (stop_perror(av[1], 0));
-	fd_infile = open(av[1], O_RDONLY);
-	if (fd_infile == -1)
-		return (stop_perror(av[1], 0));
-	dup2(fd_infile, fd[0]);
+		return (stop_child_perror(av[1], 0));
+	p->fd_in = open(av[1], O_RDONLY);
+	if (p->fd_in == -1)
+		return (stop_child_perror(av[1], 0));
+	p->fd_out = p->fd2[1];
+	close(p->fd1[0]);
+	close(p->fd1[1]);
+	close(p->fd2[0]);
 	cmd_options = ft_split(av[2], ' ');
 	if (!cmd_options)
-		return (stop_error("split command"));
-	return (run_cmd(fd, paths, cmd_options, env));
+		return (stop_error("split command", p));
+	return (run_cmd(p, cmd_options, env));
 }
 
-int	run_last(int fd[2], char **paths, char *av[], char *env[])
+int	run_last(t_pipes *p, char *av[], char *env[])
 {
-	int		fd_out;
 	char	**cmd;
 
-	/* wait(NULL); */
-	/* if (access(av[1], F_OK | W_OK) == -1) */
-		/* return (stop_perror(av[1], 0)); */
-	fd_out = open(av[1], O_WRONLY| O_CREAT | O_TRUNC,
-		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-	if (fd_out == -1)
-		return (stop_perror(av[1], 0));
-	/* dup2(fd[0], STDIN_FILENO); */
-	dup2(fd_out, fd[1]);
+	p->fd_out = open(av[1], O_WRONLY| O_CREAT | O_TRUNC, 0644);
+	if (p->fd_out == -1)
+		return (stop_perror(av[1], 0, p));
+	if (p->n_cmd % 2 == 0)
+	{
+		p->fd_in = p->fd1[0];
+		close(p->fd2[0]);
+	}
+	else
+	{
+		p->fd_in = p->fd2[0];
+		close(p->fd1[0]);
+	}
+	close(p->fd1[1]);
+	close(p->fd2[1]);
 	cmd = ft_split(av[0], ' ');
 	if (!cmd)
-		return (stop_error("split command"));
-	return (run_cmd(fd, paths, cmd, env));
+		return (stop_error("split command", p));
+	return (run_cmd(p, cmd, env));
 }
 
 int	main(int ac, char *av[], char *env[])
 {
 	pid_t	pid;
-	int		fd[2];
-	char	**paths;
+	t_pipes	p;
+	/* int		i; */
 
+	p = (t_pipes){.n_cmd = 0, .paths = NULL};
 	if (ac != 5)
-		stop_perror("Wrong arguments number", EINVAL);
-	paths = get_paths(env);
-	if (!paths)
-		return (stop_error("get_paths"));
-	if (pipe(fd) == -1)
-		stop_perror("Pipe error", 0);
+		stop_perror("Wrong arguments number", EINVAL, &p);
+	p.paths = get_paths(env);
+	if (!p.paths)
+		return (stop_error("get_paths", &p));
+	if (pipe(p.fd1) == -1 || pipe(p.fd2) == -1)
+		return (stop_perror("Pipes openning", 0, &p));
 	pid = fork();
 	if (pid == -1)
-		stop_perror("Fork error", 0);
+		return (stop_perror("First fork", 0, &p));
 	if (pid == 0)
-		run_first(fd, paths, av, env);
+		run_first(&p, av, env);
 	else
 	{
-		waitpid(pid, NULL, 0);
+		p.n_cmd++;
+		/* waitpid(pid, NULL, 0); */
+		/* i = 3; */
+		/* while (av[i] && av[i + 1] && av[i + 2]) */
+		/* { */
+		/* 	pid = fork(); */
+		/* 	if (pid == -1) */
+		/* 		return (stop_perror("fork", 0, &p)); */
+		/* 	if (pid == 0) */
+		/* 		run_cmd(&p, ft_split(av[i], ' '), env); */
+		/* 	else */
+		/* 		waitpid(pid, NULL, 0); */
+		/* } */
 		pid = fork();
+		if (pid == -1)
+			return (stop_perror("fork", 0, &p));
 		if (pid == 0)
-			run_last(fd, paths, &av[3], env);
-		else
-		{
-			write(1, "here\n", 5);
-			waitpid(pid, NULL, 0);
-			write(1, "here2\n", 6);
-		}
+			run_last(&p, &av[3], env);
+		waitpid(pid, NULL, WNOHANG);
+		/* wait(NULL); */
 	}
-	/* else */
-	/* { */
-	/* 	char buff[4096]; */
-	/* 	ft_bzero(buff, 4096); */
-	/* 	close(fd[1]); */
-	/* 	read(fd[0], &buff, 4096); */
-	/* 	close(fd[0]); */
-	/* 	write(1, &buff, ft_strlen(buff)); */
-	/* } */
+	end_pipex(&p, EXIT_SUCCESS);
 	return (0);
 }

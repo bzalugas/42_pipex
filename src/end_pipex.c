@@ -1,31 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   end_pipex.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/17 15:12:08 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/22 18:24:23 by bazaluga         ###   ########.fr       */
+/*   Created: 2024/06/22 17:33:54 by bazaluga          #+#    #+#             */
+/*   Updated: 2024/06/22 18:17:49 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
-
-typedef struct s_pipes
+#include "../include/pipex.h"
+#include <stdlib.h>
+#include <unistd.h>
+int	end_pipex(t_pipes *p, int exit_code)
 {
-	int		n_cmd;
-	int		fd1[2]; //from in to process
-	int		fd2[2]; //from process to out
-	int		fd_in;
-	int		fd_out;
-	char	**paths;
-}				t_pipes;
+	int	i;
 
-int	stop_child_perror(char *msg, int error);
-int	end_pipex(t_pipes *p, int exit_code);
-int	stop_perror(char *msg, int error, t_pipes *p);
-int	stop_error(char *msg, t_pipes *p);
-
-#endif
+	i = 0;
+	if (p->paths)
+	{
+		i = 0;
+		while (p->paths[i])
+		{
+			free(p->paths[i]);
+			i++;
+		}
+		free(p->paths);
+	}
+	exit(exit_code);
+}

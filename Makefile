@@ -6,7 +6,7 @@
 #    By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/17 15:07:33 by bazaluga          #+#    #+#              #
-#    Updated: 2024/06/19 13:18:49 by bazaluga         ###   ########.fr        #
+#    Updated: 2024/06/22 17:48:42 by bazaluga         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -22,7 +22,7 @@ LIBFTDIR    :=	$(INCDIR)/libft
 
 LIBFT	    :=	$(LIBFTDIR)/libft.a
 
-SRC	    :=	error.c pipex.c
+SRC	    :=	end_pipex.c error.c pipex.c
 
 OBJ	    :=  $(SRC:.c=.o)
 
