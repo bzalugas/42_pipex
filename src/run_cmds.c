@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/22 21:30:48 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/23 17:11:35 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,6 @@ int	run_middle_cmds(t_pipes *p, char *av[], char *env[])
 {
 	int	i;
 	int	pid;
-	int	status;
 
 	i = 3 + p->here_doc;
 	while (av[i] && av[i + 1] && av[i + 2])
@@ -112,9 +111,6 @@ int	run_middle_cmds(t_pipes *p, char *av[], char *env[])
 			handle_pipe(p);
 			run_cmd(p, ft_split(av[i], ' '), env);
 		}
-		waitpid(pid, &status, 0);
-		/* if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) */
-		/* 	stop_error("Last command didn't worked", p); */
 		i++;
 		p->n_cmd++;
 	}
@@ -125,7 +121,6 @@ int	run_all(t_pipes *p, char *av[], char *env[])
 {
 	int	pid;
 	int	i;
-	int	status;
 
 	pid = fork();
 	if (pid == -1)
@@ -134,9 +129,6 @@ int	run_all(t_pipes *p, char *av[], char *env[])
 		run_first(p, av, env);
 	if (pid != 0 && p->here_doc)
 		get_here_doc(p, av);
-	waitpid(pid, &status, 0);
-	/* if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) */
-		/* end_pipex(p, 1); */
 	p->n_cmd++;
 	i = run_middle_cmds(p, av, env);
 	pid = fork();
