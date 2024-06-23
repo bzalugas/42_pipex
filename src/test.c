@@ -1,45 +1,76 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <fcntl.h>
+#include "../include/libft.h"
 
-int	main()
+int	main(int ac, char *av[], char *env[])
 {
 	int	fd[2];
 	int	pid;
 	int	pid2;
-
+	int	fdin;
+	int	fdout;
+	char	**cmd;
 
 	if (pipe(fd) == -1)
-		exit(1);
+		return (1);
+	fdin = open(av[1], O_RDONLY);
+	if (fdin == -1)
+		return (2);
 	pid = fork();
 	if (pid == -1)
-		exit(2);
+		return (3);
 	if (pid == 0)
 	{
-		int x = 23;
-		close(fd[0]);
-		write(1, "before write\n", 13);
-		sleep(3);
-		write(fd[1], &x, sizeof(x));
-		write(1, "after write\n", 12);
-		close(fd[1]);
-	}
-	else {
-		pid2 = fork();
-		if (pid2 == -1)
-			exit(3);
-		if (pid2 == 0)
-		{
-			int	y;
-			close(fd[1]);
-			write(1, "before read\n", 12);
-			read(fd[0], &y, sizeof(y));
-			write(1, "after read\n", 11);
-			close(fd[0]);
-			printf("Read %d\n", y);
-		}
+			//child
+		cmd = ft_split(av[2], ' ');
+		if (access(cmd[0], O_EXEC) == -1)
+			exit(4);
 		else
-			wait(NULL);
+		{
+			write(1, "here\n", 5);
+			dup2(fdin, STDIN_FILENO);
+			dup2(fd[1], STDOUT_FILENO);
+			close(fd[0]);
+			close(fd[1]);
+			close(fdin);
+			execve(cmd[0], cmd, env);
+		}
 	}
-	return 0;
+	int	status;
+	//parent
+	fdout = open(av[4], O_WRONLY);
+	if (fdout == -1)
+		return (5);
+	pid2 = fork();
+	if (pid2 == -1)
+		return (6);
+	if (pid2 == 0)
+	{
+		//2nd child
+		cmd = ft_split(av[3], ' ');
+		if (access(cmd[0], O_EXEC) == -1)
+			return (7);
+		else
+		{
+			ft_printf("fdout = %d\n", fdout);
+			dup2(fd[0], STDIN_FILENO);
+			dup2(fdout, STDOUT_FILENO);
+			close(fd[0]);
+			close(fd[1]);
+			close(fdout);
+			execve(cmd[0], cmd, env);
+		}
+	}
+	//parent
+	close(fd[0]);
+	close(fd[1]);
+	ft_printf("waiting for %d and %d\n", pid, pid2);
+	waitpid(pid, &status, 0);
+	ft_printf("%d stopped\n", pid);
+	waitpid(pid2, &status, 0);
+	ft_printf("%d stopped\n", pid2);
+	return (WEXITSTATUS(status));
+	return 23;
 }

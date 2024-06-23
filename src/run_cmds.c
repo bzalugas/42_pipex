@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/23 17:11:35 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/23 20:10:30 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,13 @@ int	run_cmd(t_pipes *p, char *cmd[], char *env[])
 	{
 		abs_cmd = ft_strjoin_free(ft_strjoin(p->paths[i], "/"), cmd[0], 1, 0);
 		//use access to free abs_cmd before execve
-		if (execve(abs_cmd, cmd, env))
+		if (access(abs_cmd, O_EXEC) == -1)
 			free(abs_cmd);
+		else
+			execve(abs_cmd, cmd, env);
 		i++;
 	}
-	return (stop_error(ft_strjoin(cmd[0], ": command not found"), p));
+	return (stop_error(ft_strjoin(cmd[0], ": command not found"), 127, p));
 }
 
 int	run_first(t_pipes *p, char *av[], char *env[])
@@ -63,7 +65,7 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 	close(p->fd1[1]);
 	close(p->fd2[0]);
 	if (!cmd_options)
-		return (stop_error("split command", p));
+		return (stop_error("split command", EXIT_FAILURE, p));
 	return (run_cmd(p, cmd_options, env));
 }
 
@@ -91,7 +93,7 @@ int	run_last(t_pipes *p, char *av[], char *env[])
 	close(p->fd2[1]);
 	cmd = ft_split(av[0], ' ');
 	if (!cmd)
-		return (stop_error("split command", p));
+		return (stop_error("split command", EXIT_FAILURE, p));
 	return (run_cmd(p, cmd, env));
 }
 
@@ -121,6 +123,7 @@ int	run_all(t_pipes *p, char *av[], char *env[])
 {
 	int	pid;
 	int	i;
+	int	wstatus;
 
 	pid = fork();
 	if (pid == -1)
@@ -136,5 +139,15 @@ int	run_all(t_pipes *p, char *av[], char *env[])
 		return (stop_perror("fork", 0, p));
 	if (pid == 0)
 		run_last(p, &av[i], env);
+	else
+	{
+		close(p->fd1[0]);
+		close(p->fd1[1]);
+		close(p->fd2[0]);
+		close(p->fd2[1]);
+		waitpid(pid, &wstatus, 0);
+		if (WIFEXITED(wstatus))
+			return (WEXITSTATUS(wstatus));
+	}
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:30:13 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/22 18:33:07 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/23 20:09:32 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ int	stop_perror(char *msg, int error, t_pipes *p)
 	return (end_pipex(p, errno));
 }
 
-int	stop_error(char *msg, t_pipes *p)
+int	stop_error(char *msg, int error, t_pipes *p)
 {
 	ft_putendl_fd(msg, STDERR_FILENO);
-	return (end_pipex(p, EXIT_FAILURE));
+	return (end_pipex(p, error));
 }
