@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:11:46 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/23 20:11:01 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/24 22:21:33 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ int	main(int ac, char *av[], char *env[])
 	t_pipes	p;
 	int		res;
 
-	p = (t_pipes){.n_cmd = 0, .paths = NULL};
+	p = (t_pipes){.n_cmd = 0, .paths = NULL, .fd_in = -1, .fd_out = -1};
 	if (ac < 5)
 		stop_perror("Wrong arguments number", EINVAL, &p);
 	p.paths = get_paths(env);
@@ -63,11 +63,7 @@ int	main(int ac, char *av[], char *env[])
 	if (pipe(p.fd1) == -1 || pipe(p.fd2) == -1)
 		return (stop_perror("Pipes openning", 0, &p));
 	if (!ft_strncmp(av[1], "here_doc", 8))
-	{
 		p.here_doc = true;
-		if (pipe(p.fd_hd) == -1)
-			stop_perror("Pipe here_doc", 0, &p);
-	}
 	res = run_all(&p, av, env);
 	end_pipex(&p, res);
 	return (0);

@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/23 20:17:54 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/24 22:32:16 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,14 @@ int	run_cmd(t_pipes *p, char *cmd[], char *env[])
 	size_t	i;
 	char	*abs_cmd;
 
+	ft_printf("fd_out = %d\n", p->fd_out);
+	ft_printf("stdout = %d\n", STDOUT_FILENO);
+	ft_putstr_fd("LKFJDLJJL\n", p->fd_out);
 	dup2(p->fd_in, STDIN_FILENO);
 	dup2(p->fd_out, STDOUT_FILENO);
 	close(p->fd_in);
 	close(p->fd_out);
-
+	/* ft_putstr_fd("CACA", STDOUT_FILENO); */
 	if (cmd[0][0] == '/' || (cmd[0][0] == '.' && cmd[0][1] == '/'))
 		if (execve(cmd[0], cmd, env))
 			stop_error(ft_strjoin(cmd[0], ": command not found"), 127, p);
@@ -55,15 +58,15 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 		if (p->fd_in == -1)
 			return (stop_child_perror(av[1], 0));
 		cmd_options = ft_split(av[2], ' ');
+		close(p->fd1[0]);
 	}
 	else
 	{
-		p->fd_in = p->fd_hd[0];
-		close(p->fd_hd[1]);
+		p->fd_in = p->fd1[0];
+		close(p->fd1[1]);
 		cmd_options = ft_split(av[3], ' ');
 	}
 	p->fd_out = p->fd2[1];
-	close(p->fd1[0]);
 	close(p->fd1[1]);
 	close(p->fd2[0]);
 	if (!cmd_options)
@@ -74,11 +77,17 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 int	run_last(t_pipes *p, char *av[], char *env[])
 {
 	char	**cmd;
+	/* int		fd; */
 
+	write(1, "last\n", 5);
 	if (!p->here_doc)
 		p->fd_out = open(av[1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	else
 		p->fd_out = open(av[1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+	ft_printf("fd1[0] = %d, fd1[1] = %d, fd2[0] = %d, fd2[1] = %d, fd_out = %d\n",
+		p->fd1[0], p->fd1[1], p->fd2[0], p->fd2[1], p->fd_out);
+	// HERE fd_out takes same value as fd1[1] => because of close in main ???
+	//write to p->fd_out works fine
 	if (p->fd_out == -1)
 		return (stop_perror(av[1], 0, p));
 	if (p->n_cmd % 2 == 0)
@@ -93,6 +102,7 @@ int	run_last(t_pipes *p, char *av[], char *env[])
 	}
 	close(p->fd1[1]);
 	close(p->fd2[1]);
+	ft_putstr_fd("CACA\n", p->fd_out);
 	cmd = ft_split(av[0], ' ');
 	if (!cmd)
 		return (stop_error("split command", EXIT_FAILURE, p));
@@ -144,7 +154,8 @@ int	run_all(t_pipes *p, char *av[], char *env[])
 	else
 	{
 		close(p->fd1[0]);
-		close(p->fd1[1]);
+		if (!p->here_doc)
+			close(p->fd1[1]);
 		close(p->fd2[0]);
 		close(p->fd2[1]);
 		waitpid(pid, &wstatus, 0);

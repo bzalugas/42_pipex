@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:38:09 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/22 21:31:13 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/24 20:05:25 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,9 @@ int	get_here_doc(t_pipes *p, char *av[])
 	char	*here_doc;
 
 	here_doc = get_here_doc_str(av);
-	close(p->fd_hd[0]);
-	ft_putstr_fd(here_doc, p->fd_hd[1]);
-	close(p->fd_hd[1]);
+	/* close(p->fd1[0]); */
+	ft_putstr_fd(here_doc, p->fd1[1]);
 	free(here_doc);
+	close(p->fd1[1]);
 	return (0);
 }
