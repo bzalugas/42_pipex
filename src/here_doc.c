@@ -6,43 +6,34 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:38:09 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/24 20:05:25 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/25 10:35:13 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/pipex.h"
 #include "../include/libft.h"
 
-static char	*get_here_doc_str(char *av[])
+int	get_here_doc(t_pipes *p, char *av[])
 {
-	char	*here_doc;
 	char	*line;
 	char	*lim;
 
-	here_doc = NULL;
 	line = get_next_line(STDIN_FILENO);
 	while (line)
 	{
 		lim = ft_strnstr(line, av[2], ft_strlen(line));
 		if (lim)
-			return (ft_strjoin_free(here_doc,
-					ft_strndup(line, lim - line), 1, 1));
+		{
+			if (line != lim)
+				write(p->fd1[1], line, lim - line);
+			free(line);
+			close(p->fd1[1]);
+			return (0);
+		}
 		else
-			here_doc = ft_strjoin_free(here_doc, line, 1, 0);
+			ft_putstr_fd(line, p->fd1[1]);
 		free(line);
 		line = get_next_line(STDIN_FILENO);
 	}
-	return (NULL);
-}
-
-int	get_here_doc(t_pipes *p, char *av[])
-{
-	char	*here_doc;
-
-	here_doc = get_here_doc_str(av);
-	/* close(p->fd1[0]); */
-	ft_putstr_fd(here_doc, p->fd1[1]);
-	free(here_doc);
-	close(p->fd1[1]);
 	return (0);
 }
