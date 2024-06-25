@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:12:08 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/24 19:24:56 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/25 11:39:17 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,5 +32,6 @@ int		stop_error(char *msg, int error, t_pipes *p);
 void	handle_pipe(t_pipes *p);
 int		run_all(t_pipes *p, char *av[], char *env[]);
 int		get_here_doc(t_pipes *p, char *av[]);
+void	handle_pipe(t_pipes *p);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/25 10:58:05 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/25 11:28:14 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,10 @@ int	run_cmd(t_pipes *p, char *cmd[], char *env[])
 			execve(abs_cmd, cmd, env);
 		i++;
 	}
+	if (p->n_cmd % 2 == 0)
+		close(p->fd2[1]);
+	else
+		close(p->fd1[1]);
 	return (stop_error(ft_strjoin(cmd[0], ": command not found"), 127, p));
 }
 
@@ -53,7 +57,7 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 		close(p->fd1[0]);
 		p->fd_in = open(av[1], O_RDONLY);
 		if (p->fd_in == -1)
-			return (stop_child_perror(av[1], 0));
+			return (close(p->fd2[1]), stop_perror(av[1], 0, p));
 		cmd_options = ft_split(av[2], ' ');
 	}
 	else
@@ -139,7 +143,8 @@ int	run_all(t_pipes *p, char *av[], char *env[])
 	if (pid == 0)
 		run_last(p, &av[i], env);
 	close(p->fd1[0]);
-	close(p->fd1[1]);
+	if (!p->here_doc)
+		close(p->fd1[1]);
 	close(p->fd2[0]);
 	close(p->fd2[1]);
 	waitpid(pid, &wstatus, 0);
