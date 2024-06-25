@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 17:33:54 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/25 12:00:50 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/25 23:13:17 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,6 @@
 #include "../include/libft.h"
 #include <errno.h>
 #include <stdio.h>
-
-static int	fd_in_not_pipe(t_pipes *p)
-{
-	return (p->fd_in != p->fd1[0] && p->fd_in != p->fd1[1]
-		&& p->fd_in != p->fd2[0] && p->fd_in != p->fd2[1]);
-}
-
-static int	fd_out_not_pipe(t_pipes *p)
-{
-	return (p->fd_out != p->fd1[0] && p->fd_out != p->fd1[1]
-		&& p->fd_out != p->fd2[0] && p->fd_out != p->fd2[1]);
-}
 
 int	end_pipex(t_pipes *p, int exit_code, bool close_fds)
 {
@@ -44,14 +32,14 @@ int	end_pipex(t_pipes *p, int exit_code, bool close_fds)
 	}
 	if (close_fds)
 	{
-		close(p->fd1[0]);
-		close(p->fd1[1]);
-		close(p->fd2[0]);
-		close(p->fd2[1]);
-		if (fd_in_not_pipe(p))
-			close(p->fd_in);
-		if (fd_out_not_pipe(p))
-			close(p->fd_out);
+		i = -1;
+		while (++i < 2)
+		{
+			if (p->fd[i][0] != -1)
+				ft_close(p, p->fd[i][0]);
+			if (p->fd[i][1] != -1)
+				ft_close(p, p->fd[i][1]);
+		}
 	}
 	exit(exit_code);
 }
