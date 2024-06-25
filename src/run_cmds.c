@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/25 11:28:14 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/25 11:59:14 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	run_cmd(t_pipes *p, char *cmd[], char *env[])
 	close(p->fd_out);
 	if (cmd[0][0] == '/' || (cmd[0][0] == '.' && cmd[0][1] == '/'))
 		if (execve(cmd[0], cmd, env))
-			stop_error(ft_strjoin(cmd[0], ": command not found"), 127, p);
+			stop_error(ft_strjoin(cmd[0], ": command not found"), 127, p, 0);
 	i = 0;
 	while (p->paths[i])
 	{
@@ -43,7 +43,7 @@ int	run_cmd(t_pipes *p, char *cmd[], char *env[])
 		close(p->fd2[1]);
 	else
 		close(p->fd1[1]);
-	return (stop_error(ft_strjoin(cmd[0], ": command not found"), 127, p));
+	return (stop_error(ft_strjoin(cmd[0], ": command not found"), 127, p, 0));
 }
 
 int	run_first(t_pipes *p, char *av[], char *env[])
@@ -57,7 +57,7 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 		close(p->fd1[0]);
 		p->fd_in = open(av[1], O_RDONLY);
 		if (p->fd_in == -1)
-			return (close(p->fd2[1]), stop_perror(av[1], 0, p));
+			return (close(p->fd2[1]), stop_perror(av[1], 0, p, false));
 		cmd_options = ft_split(av[2], ' ');
 	}
 	else
@@ -68,7 +68,8 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 	}
 	p->fd_out = p->fd2[1];
 	if (!cmd_options)
-		return (stop_error("split command", EXIT_FAILURE, p));
+		return (close(p->fd_in), stop_error("split command", EXIT_FAILURE, p,
+				false));
 	return (run_cmd(p, cmd_options, env));
 }
 
@@ -78,12 +79,6 @@ int	run_last(t_pipes *p, char *av[], char *env[])
 
 	close(p->fd1[1]);
 	close(p->fd2[1]);
-	if (!p->here_doc)
-		p->fd_out = open(av[1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	else
-		p->fd_out = open(av[1], O_WRONLY | O_CREAT | O_APPEND, 0644);
-	if (p->fd_out == -1)
-		return (stop_perror(av[1], 0, p));
 	if (p->n_cmd % 2 == 0)
 	{
 		p->fd_in = p->fd1[0];
@@ -94,9 +89,16 @@ int	run_last(t_pipes *p, char *av[], char *env[])
 		p->fd_in = p->fd2[0];
 		close(p->fd1[0]);
 	}
+	if (!p->here_doc)
+		p->fd_out = open(av[1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	else
+		p->fd_out = open(av[1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+	if (p->fd_out == -1)
+		return (close(p->fd_in), stop_perror(av[1], 0, p, 0));
 	cmd = ft_split(av[0], ' ');
 	if (!cmd)
-		return (stop_error("split command", EXIT_FAILURE, p));
+		return (close(p->fd_in), close(p->fd_out),
+			stop_error("split command", EXIT_FAILURE, p, false));
 	return (run_cmd(p, cmd, env));
 }
 
@@ -110,7 +112,7 @@ int	run_middle_cmds(t_pipes *p, char *av[], char *env[])
 	{
 		pid = fork();
 		if (pid == -1)
-			return (stop_perror("fork", 0, p));
+			return (stop_perror("fork", 0, p, true));
 		if (pid == 0)
 		{
 			handle_pipe(p);
@@ -130,7 +132,7 @@ int	run_all(t_pipes *p, char *av[], char *env[])
 
 	pid = fork();
 	if (pid == -1)
-		return (stop_perror("First fork", 0, p));
+		return (stop_perror("First fork", 0, p, true));
 	if (pid == 0)
 		run_first(p, av, env);
 	if (pid != 0 && p->here_doc)
@@ -139,7 +141,7 @@ int	run_all(t_pipes *p, char *av[], char *env[])
 	i = run_middle_cmds(p, av, env);
 	pid = fork();
 	if (pid == -1)
-		return (stop_perror("fork", 0, p));
+		return (stop_perror("fork", 0, p, true));
 	if (pid == 0)
 		run_last(p, &av[i], env);
 	close(p->fd1[0]);
