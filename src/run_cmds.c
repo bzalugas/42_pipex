@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/25 10:53:02 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/25 10:58:05 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int	run_cmd(t_pipes *p, char *cmd[], char *env[])
 	while (p->paths[i])
 	{
 		abs_cmd = ft_strjoin_free(ft_strjoin(p->paths[i], "/"), cmd[0], 1, 0);
-		if (access(abs_cmd, O_EXEC) == -1)
+		if (access(abs_cmd, X_OK) == -1)
 			free(abs_cmd);
 		else
 			execve(abs_cmd, cmd, env);
