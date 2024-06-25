@@ -16,6 +16,9 @@
 :Effort:   50:00
 :END:
 *** TODO reduce pipes number for here_doc
+*** TODO Recode pipex
++ fd[2][2]
++ I need to create a pipe before each fork => use fd[i % 2==0]
 *** CODING pipex program
 :LOGBOOK:
 CLOCK: [2024-06-23 Sun 18:35]--[2024-06-23 Sun 20:18] =>  1:43
