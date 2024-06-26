@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/26 16:08:12 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/26 16:09:48 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 		return (run_cmd(p, cmd, env));
 	}
 	p->n_cmd++;
+	free_split(cmd);
 	/* ft_close(p, p->fd[0][0]); */
 	return (0);
 }
