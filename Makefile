@@ -6,7 +6,7 @@
 #    By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/17 15:07:33 by bazaluga          #+#    #+#              #
-#    Updated: 2024/06/26 00:12:11 by bazaluga         ###   ########.fr        #
+#    Updated: 2024/06/26 09:41:09 by bazaluga         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -22,7 +22,7 @@ LIBFTDIR    :=	$(INCDIR)/libft
 
 LIBFT	    :=	$(LIBFTDIR)/libft.a
 
-SRC	    :=	end_pipex.c handle_in_out.c handle_pipe.c run_cmds.c pipex.c
+SRC	    :=	end_pipex.c handle_in_out.c handle_pipe.c run_cmds.c pipex.c utils.c
 
 OBJ	    :=  $(SRC:.c=.o)
 
@@ -87,7 +87,7 @@ fclean:		clean
 		@echo $(RESET)
 
 re:		fclean
-		@make all
+		@make -s all
 
 -include	$(OBJ:.o=.d)
 
