@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/26 01:44:57 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/26 12:22:26 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,7 @@ int	run_cmd(t_pipes *p, char *cmd[], char *env[])
 		if (access(abs_cmd, X_OK) == -1)
 			free(abs_cmd);
 		else
-		{
-			ft_putendl_fd(abs_cmd, 2);
 			execve(abs_cmd, cmd, env);
-		}
 		i++;
 	}
 	return (stop_error(ft_strjoin(cmd[0], ": command not found"), 127, p, 0));
@@ -57,6 +54,8 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 
 	if (pipe(p->fd[1]) == -1)
 		stop_error("pipe error", EXIT_FAILURE, p, true);
+	if (!p->here_doc && p->fd[0][0] == -1)
+		return (1);
 	pid = fork();
 	if (pid == -1)
 		stop_error("fork error", EXIT_FAILURE, p, true);
@@ -138,7 +137,8 @@ int	run_all(t_pipes *p, char *av[], char *env[])
 	}
 	else
 		get_infile(p, av);
-	run_first(p, av, env);
+	if (run_first(p, av, env) == 1)
+		p->n_cmd++;
 	run_middle(p, av, env);
 	get_outfile(p, av[p->n_cmd + 3 + p->here_doc]);
 	return (run_last(p, &av[p->n_cmd + 2 + p->here_doc], env));
