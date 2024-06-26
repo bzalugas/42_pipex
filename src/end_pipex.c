@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 17:33:54 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/25 23:13:17 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/26 12:25:33 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,10 @@ int	stop_perror(char *msg, int error, t_pipes *p, bool close_fds)
 {
 	if (error != 0)
 		errno = error;
+	else
+		error = EXIT_FAILURE;
 	perror(msg);
-	return (end_pipex(p, errno, close_fds));
+	return (end_pipex(p, error, close_fds));
 }
 
 int	stop_error(char *msg, int error, t_pipes *p, bool close_fds)
