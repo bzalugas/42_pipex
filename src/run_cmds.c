@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/26 12:22:26 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/26 12:38:14 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 		stop_error("fork error", EXIT_FAILURE, p, true);
 	if (pid == 0)
 	{
+		//move split outside fork to avoid leaks ?
 		cmd = ft_split(av[2 + p->here_doc], ' ');
 		if (!cmd)
 			stop_error("split", EXIT_FAILURE, p, true);
