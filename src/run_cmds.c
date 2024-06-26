@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/26 15:42:23 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/26 16:08:12 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,6 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 
 	if (pipe(p->fd[1]) == -1)
 		stop_error("pipe error", EXIT_FAILURE, p, true);
-	if (!p->here_doc && p->fd[0][0] == -1)
-		return (1);
 	cmd = ft_split(av[2 + p->here_doc], ' ');
 	if (!cmd)
 		stop_error("split", EXIT_FAILURE, p, true);
@@ -61,9 +59,15 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 	if (pid == -1)
 		stop_error("fork error", EXIT_FAILURE, p, true);
 	if (pid == 0)
+	{
+		if (!p->here_doc && get_infile(p, av))
+			exit(EXIT_FAILURE);
+		else if (p->here_doc)
+			ft_close(p, p->fd[0][1]);
 		return (run_cmd(p, cmd, env));
+	}
 	p->n_cmd++;
-	ft_close(p, p->fd[0][0]);
+	/* ft_close(p, p->fd[0][0]); */
 	return (0);
 }
 
@@ -132,8 +136,6 @@ int	run_all(t_pipes *p, char *av[], char *env[])
 			stop_error("pipe error", EXIT_FAILURE, p, false);
 		get_here_doc(p, av);
 	}
-	else
-		get_infile(p, av);
 	if (run_first(p, av, env) == 1)
 		p->n_cmd++;
 	run_middle(p, av, env);
