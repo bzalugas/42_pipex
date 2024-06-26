@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 13:52:23 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/26 13:55:51 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/26 15:42:08 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,5 +24,5 @@ void	free_split(char **arr)
 		free(arr[i]);
 		i++;
 	}
-	free(arr[i]);
+	free(arr);
 }

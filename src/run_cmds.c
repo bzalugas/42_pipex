@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/26 12:38:14 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/26 15:42:23 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,8 @@ int	run_cmd(t_pipes *p, char *cmd[], char *env[])
 	while (p->paths[i])
 	{
 		abs_cmd = ft_strjoin_free(ft_strjoin(p->paths[i], "/"), cmd[0], 1, 0);
-		if (access(abs_cmd, X_OK) == -1)
-			free(abs_cmd);
-		else
-			execve(abs_cmd, cmd, env);
+		execve(abs_cmd, cmd, env);
+		free(abs_cmd);
 		i++;
 	}
 	return (stop_error(ft_strjoin(cmd[0], ": command not found"), 127, p, 0));
@@ -56,17 +54,14 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 		stop_error("pipe error", EXIT_FAILURE, p, true);
 	if (!p->here_doc && p->fd[0][0] == -1)
 		return (1);
+	cmd = ft_split(av[2 + p->here_doc], ' ');
+	if (!cmd)
+		stop_error("split", EXIT_FAILURE, p, true);
 	pid = fork();
 	if (pid == -1)
 		stop_error("fork error", EXIT_FAILURE, p, true);
 	if (pid == 0)
-	{
-		//move split outside fork to avoid leaks ?
-		cmd = ft_split(av[2 + p->here_doc], ' ');
-		if (!cmd)
-			stop_error("split", EXIT_FAILURE, p, true);
 		return (run_cmd(p, cmd, env));
-	}
 	p->n_cmd++;
 	ft_close(p, p->fd[0][0]);
 	return (0);
@@ -81,14 +76,15 @@ int	run_last(t_pipes *p, char *av[], char *env[])
 	pid = fork();
 	if (pid == -1)
 		stop_error("fork error", EXIT_FAILURE, p, true);
+	cmd = ft_split(av[0], ' ');
+	if (!cmd)
+		stop_error("split", EXIT_FAILURE, p, true);
 	if (pid == 0)
 	{
-		cmd = ft_split(av[0], ' ');
-		if (!cmd)
-			stop_error("split", EXIT_FAILURE, p, true);
 		ft_close(p, p->fd[p->n_cmd % 2][1]);
 		return (run_cmd(p, cmd, env));
 	}
+	free_split(cmd);
 	ft_close(p, p->fd[p->n_cmd % 2][0]);
 	ft_close(p, p->fd[p->n_cmd % 2][1]);
 	waitpid(pid, &wstatus, 0);
