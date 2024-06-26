@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/26 16:09:48 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/26 16:11:45 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,7 @@ int	run_last(t_pipes *p, char *av[], char *env[])
 		stop_error("split", EXIT_FAILURE, p, true);
 	if (pid == 0)
 	{
+		get_outfile(p, av[1]);
 		ft_close(p, p->fd[p->n_cmd % 2][1]);
 		return (run_cmd(p, cmd, env));
 	}
@@ -93,7 +94,7 @@ int	run_last(t_pipes *p, char *av[], char *env[])
 	ft_close(p, p->fd[p->n_cmd % 2][0]);
 	ft_close(p, p->fd[p->n_cmd % 2][1]);
 	waitpid(pid, &wstatus, 0);
-	ft_close(p, p->fd[(p->n_cmd - 1) % 2][1]);
+	/* ft_close(p, p->fd[(p->n_cmd - 1) % 2][1]); */
 	return (WEXITSTATUS(wstatus));
 }
 
@@ -140,6 +141,5 @@ int	run_all(t_pipes *p, char *av[], char *env[])
 	if (run_first(p, av, env) == 1)
 		p->n_cmd++;
 	run_middle(p, av, env);
-	get_outfile(p, av[p->n_cmd + 3 + p->here_doc]);
 	return (run_last(p, &av[p->n_cmd + 2 + p->here_doc], env));
 }
