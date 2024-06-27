@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/27 18:52:44 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/27 20:22:27 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,11 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 		stop_error("fork error", EXIT_FAILURE, p, true);
 	if (pid == 0)
 	{
-		if (!p->here_doc && get_infile(p, av))
-			exit(EXIT_FAILURE);
-		else if (p->here_doc)
-			ft_close(p, p->fd[0][1]);
 		ft_close(p, p->fd[1][0]);
+		if (!p->here_doc)
+			get_infile(p, av[1]);
+		else
+			ft_close(p, p->fd[0][1]);
 		return (run_cmd(p, cmd, env));
 	}
 	p->n_cmd++;
@@ -86,8 +86,8 @@ int	run_last(t_pipes *p, char *av[], char *env[])
 		stop_error("split", EXIT_FAILURE, p, true);
 	if (pid == 0)
 	{
-		get_outfile(p, av[1]);
 		ft_close(p, p->fd[p->n_cmd % 2][1]);
+		get_outfile(p, av[1]);
 		return (run_cmd(p, cmd, env));
 	}
 	free_split(cmd);

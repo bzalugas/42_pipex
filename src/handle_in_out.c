@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 00:12:02 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/26 12:10:51 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/27 20:19:20 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #include "../include/libft.h"
 #include <fcntl.h>
 #include <stdbool.h>
-#include <stdio.h>
 
 int	get_here_doc(t_pipes *p, char *av[])
 {
@@ -41,14 +40,11 @@ int	get_here_doc(t_pipes *p, char *av[])
 	return (0);
 }
 
-int	get_infile(t_pipes *p, char *av[])
+int	get_infile(t_pipes *p, char *filename)
 {
-	p->fd[0][0] = open(av[1], O_RDONLY);
+	p->fd[0][0] = open(filename, O_RDONLY);
 	if (p->fd[0][0] == -1)
-	{
-		perror(av[1]);
-		return (1);
-	}
+		stop_perror(filename, 0, p, true);
 	return (0);
 }
 

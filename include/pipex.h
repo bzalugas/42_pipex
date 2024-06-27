@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:12:08 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/26 09:40:36 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/27 20:18:55 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int		stop_error(char *msg, int error, t_pipes *p, bool close_fds);
 /* Main functions */
 int		run_all(t_pipes *p, char *av[], char *env[]);
 int		get_here_doc(t_pipes *p, char *av[]);
-int		get_infile(t_pipes *p, char *av[]);
+int		get_infile(t_pipes *p, char *filename);
 int		get_outfile(t_pipes *p, char *filename);
 void	free_split(char **arr);
 
