@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/26 16:11:45 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/27 18:52:44 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,11 +64,11 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 			exit(EXIT_FAILURE);
 		else if (p->here_doc)
 			ft_close(p, p->fd[0][1]);
+		ft_close(p, p->fd[1][0]);
 		return (run_cmd(p, cmd, env));
 	}
 	p->n_cmd++;
 	free_split(cmd);
-	/* ft_close(p, p->fd[0][0]); */
 	return (0);
 }
 
@@ -94,6 +94,7 @@ int	run_last(t_pipes *p, char *av[], char *env[])
 	ft_close(p, p->fd[p->n_cmd % 2][0]);
 	ft_close(p, p->fd[p->n_cmd % 2][1]);
 	waitpid(pid, &wstatus, 0);
+	wait(NULL);
 	/* ft_close(p, p->fd[(p->n_cmd - 1) % 2][1]); */
 	return (WEXITSTATUS(wstatus));
 }
