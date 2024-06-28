@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 17:33:54 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/28 14:56:04 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/28 15:35:39 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,12 @@ int	stop_perror(char *msg, int error, t_pipes *p, bool close_fds)
 
 int	stop_error(char *msg, int error, t_pipes *p, bool close_fds)
 {
-	ft_putendl_fd(msg, STDERR_FILENO);
+	if (error == 127)
+	{
+		ft_putstr_fd(msg, STDERR_FILENO);
+		ft_putendl_fd(": command not found", STDERR_FILENO);
+	}
+	else
+		ft_putendl_fd(msg, STDERR_FILENO);
 	return (end_pipex(p, error, close_fds));
 }

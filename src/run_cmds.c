@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/28 15:13:15 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/28 15:36:07 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int	run_cmd(t_pipes *p, char *cmd[], char *env[])
 	ft_close(p, fd_out);
 	if (cmd[0][0] == '/' || (cmd[0][0] == '.' && cmd[0][1] == '/'))
 		if (execve(cmd[0], cmd, env))
-			stop_error(ft_strjoin(cmd[0], ": command not found"), 127, p, 1);
+			stop_error(cmd[0], 127, p, 1);
 	i = 0;
 	while (p->paths[i])
 	{
@@ -42,7 +42,7 @@ int	run_cmd(t_pipes *p, char *cmd[], char *env[])
 		free(abs_cmd);
 		i++;
 	}
-	return (stop_error(ft_strjoin(cmd[0], ": command not found"), 127, p, 1));
+	return (stop_error(cmd[0], 127, p, 1));
 }
 
 int	run_first(t_pipes *p, char *av[], char *env[])
