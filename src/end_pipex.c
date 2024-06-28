@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 17:33:54 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/26 12:25:33 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/28 14:56:04 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,15 +21,9 @@ int	end_pipex(t_pipes *p, int exit_code, bool close_fds)
 
 	i = 0;
 	if (p->paths)
-	{
-		i = 0;
-		while (p->paths[i])
-		{
-			free(p->paths[i]);
-			i++;
-		}
-		free(p->paths);
-	}
+		free_split(p->paths);
+	if (p->cmd_opts)
+		free_split(p->cmd_opts);
 	if (close_fds)
 	{
 		i = -1;

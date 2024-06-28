@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:11:46 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/26 01:41:31 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/28 15:08:02 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,18 +17,44 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-static char	**get_paths(char *env[])
+static void	*free_broken_split(char **arr, size_t broken_idx)
 {
 	size_t	i;
 
+	if (!arr)
+		return (NULL);
 	i = 0;
-	while (env[i])
+	while (i < broken_idx)
+		free(arr[i++]);
+	i++;
+	while (arr[i])
+		free(arr[i++]);
+	return (NULL);
+}
+
+static char	**get_paths(char *env[])
+{
+	size_t	i;
+	char	**paths;
+
+	i = 0;
+	while (env[i] && ft_strncmp(env[i], "PATH=", 5))
+		i++;
+	if (env[i])
+		paths = ft_split(&env[i][5], ':');
+	else
+		return (NULL);
+	if (!paths)
+		return (NULL);
+	i = 0;
+	while (paths[i])
 	{
-		if (!ft_strncmp(env[i], "PATH=", 5))
-			return (ft_split(&env[i][5], ':'));
+		paths[i] = ft_strjoin_free(paths[i], "/", 1, 0);
+		if (!paths[i])
+			return (free_broken_split(paths, i));
 		i++;
 	}
-	return (NULL);
+	return (paths);
 }
 
 int	main(int ac, char *av[], char *env[])
@@ -37,7 +63,7 @@ int	main(int ac, char *av[], char *env[])
 	int		res;
 
 	p = (t_pipes){.n_cmd = 0, .fd[0][0] = -1, .fd[0][1] = -1, .fd[1][0] = -1,
-		.fd[1][1] = -1, .paths = NULL};
+		.fd[1][1] = -1, .paths = NULL, .cmd_opts = NULL};
 	if (ac < 5)
 		stop_error("Usage: ./pipex infile cmd1 cmd2 outfile", EXIT_FAILURE, &p,
 			false);

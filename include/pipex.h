@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:12:08 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/27 20:18:55 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/28 14:37:21 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ typedef struct s_pipes
 	int		n_cmd;
 	int		fd[2][2];
 	char	**paths;
+	char	**cmd_opts;
 	bool	here_doc;
 }				t_pipes;
 
