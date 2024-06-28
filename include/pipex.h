@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:12:08 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/28 14:37:21 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/28 15:55:46 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,5 +39,6 @@ void	free_split(char **arr);
 /* PIPES & FD HANDLING */
 void	handle_pipe(t_pipes *p);
 int		ft_close(t_pipes *p, int fd);
+void	close_in_pipe(t_pipes *p);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/28 15:44:33 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/28 15:56:02 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	run_cmd(t_pipes *p, char *cmd[], char *env[])
 	int		fd_in;
 	int		fd_out;
 
-	fd_in =  p->fd[p->n_cmd % 2][0];
+	fd_in = p->fd[p->n_cmd % 2][0];
 	fd_out = p->fd[(p->n_cmd + 1) % 2][1];
 	dup2(fd_in, STDIN_FILENO);
 	dup2(fd_out, STDOUT_FILENO);
@@ -116,8 +116,7 @@ int	run_middle(t_pipes *p, char *av[], char *env[])
 				stop_error("split", EXIT_FAILURE, p, true);
 			return (run_cmd(p, p->cmd_opts, env));
 		}
-		ft_close(p, p->fd[p->n_cmd % 2][0]);
-		ft_close(p, p->fd[p->n_cmd % 2][1]);
+		close_in_pipe(p);
 		i++;
 		p->n_cmd++;
 	}

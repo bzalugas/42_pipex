@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 00:12:02 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/27 20:19:20 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/28 16:00:00 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,13 +50,14 @@ int	get_infile(t_pipes *p, char *filename)
 
 int	get_outfile(t_pipes *p, char *filename)
 {
+	int	fdn;
+
+	fdn = (p->n_cmd - 1) % 2;
 	if (p->here_doc)
-		p->fd[(p->n_cmd - 1) % 2][1] = open(filename, O_WRONLY | O_CREAT
-			| O_APPEND, 0644);
+		p->fd[fdn][1] = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	else
-		p->fd[(p->n_cmd - 1) % 2][1] = open(filename, O_WRONLY | O_CREAT
-			| O_TRUNC, 0644);
-	if (p->fd[(p->n_cmd - 1) % 2][1] == -1)
+		p->fd[fdn][1] = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (p->fd[fdn][1] == -1)
 		stop_perror(filename, 0, p, true);
 	return (0);
 }
