@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/28 15:36:07 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/28 15:44:33 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,6 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 
 	if (pipe(p->fd[1]) == -1)
 		stop_error("pipe error", EXIT_FAILURE, p, true);
-	p->cmd_opts = ft_split(av[2 + p->here_doc], ' ');
-	if (!p->cmd_opts)
-		stop_error("split", EXIT_FAILURE, p, true);
 	pid = fork();
 	if (pid == -1)
 		stop_error("fork error", EXIT_FAILURE, p, true);
@@ -64,11 +61,12 @@ int	run_first(t_pipes *p, char *av[], char *env[])
 			get_infile(p, av[1]);
 		else
 			ft_close(p, p->fd[0][1]);
+		p->cmd_opts = ft_split(av[2 + p->here_doc], ' ');
+		if (!p->cmd_opts)
+			stop_error("split", EXIT_FAILURE, p, true);
 		return (run_cmd(p, p->cmd_opts, env));
 	}
 	p->n_cmd++;
-	free_split(p->cmd_opts);
-	p->cmd_opts = NULL;
 	return (0);
 }
 
@@ -80,17 +78,15 @@ int	run_last(t_pipes *p, char *av[], char *env[])
 	pid = fork();
 	if (pid == -1)
 		stop_error("fork error", EXIT_FAILURE, p, true);
-	p->cmd_opts = ft_split(av[0], ' ');
-	if (!p->cmd_opts)
-		stop_error("split", EXIT_FAILURE, p, true);
 	if (pid == 0)
 	{
 		ft_close(p, p->fd[p->n_cmd % 2][1]);
 		get_outfile(p, av[1]);
+		p->cmd_opts = ft_split(av[0], ' ');
+		if (!p->cmd_opts)
+			stop_error("split", EXIT_FAILURE, p, true);
 		return (run_cmd(p, p->cmd_opts, env));
 	}
-	free_split(p->cmd_opts);
-	p->cmd_opts = NULL;
 	ft_close(p, p->fd[p->n_cmd % 2][0]);
 	ft_close(p, p->fd[p->n_cmd % 2][1]);
 	waitpid(pid, &wstatus, 0);
@@ -108,17 +104,16 @@ int	run_middle(t_pipes *p, char *av[], char *env[])
 	{
 		if (pipe(p->fd[(p->n_cmd - 1) % 2]) == -1)
 			stop_error("pipe", EXIT_FAILURE, p, true);
-		write(1, "here\n", 5);
 		pid = fork();
 		if (pid == -1)
 			stop_error("fork error", EXIT_FAILURE, p, true);
 		if (pid == 0)
 		{
+			ft_close(p, p->fd[p->n_cmd % 2][1]);
+			ft_close(p, p->fd[(p->n_cmd - 1) % 2][0]);
 			p->cmd_opts = ft_split(av[i], ' ');
 			if (!p->cmd_opts)
 				stop_error("split", EXIT_FAILURE, p, true);
-			ft_close(p, p->fd[p->n_cmd % 2][1]);
-			ft_close(p, p->fd[(p->n_cmd - 1) % 2][0]);
 			return (run_cmd(p, p->cmd_opts, env));
 		}
 		ft_close(p, p->fd[p->n_cmd % 2][0]);
