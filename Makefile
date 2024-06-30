@@ -6,13 +6,15 @@
 #    By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/17 15:07:33 by bazaluga          #+#    #+#              #
-#    Updated: 2024/06/30 15:25:31 by bazaluga         ###   ########.fr        #
+#    Updated: 2024/06/30 15:38:01 by bazaluga         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
 NAME	    :=	pipex
 
-NAMEB	    :=	obj_bonus/pipex
+NAMETMP	    :=	obj/tmp_pipex
+
+NAMEB	    :=	obj_bonus/tmp_pipex
 
 SRCDIR	    :=	src
 
@@ -57,7 +59,7 @@ RESET	:=  "\033[0m"
 
 all:		$(NAME)
 
-# bonus:		$(NAMEB)
+bonus:		$(NAMEB)
 
 $(OBJDIR):
 		mkdir -p $(OBJDIR)
@@ -80,18 +82,21 @@ $(LIBFT):
 		@make -sC $(LIBFTDIR)
 		@echo $(GREEN)"\n\tLIBFT COMPILED"$(RESET)
 
-$(NAME):	$(OBJ) $(LIBFT)
+$(NAMETMP):	$(OBJ) $(LIBFT)
+		@rm -f $(NAMEB)
 		@echo $(GREEN)"LINKING mandatory objects to create $(NAME)"
-		$(CC) $(OBJ) $(CFLAGS) -L$(LIBFTDIR) -lft -o $(NAME)
+		$(CC) $(OBJ) $(CFLAGS) -L$(LIBFTDIR) -lft -o $(NAMETMP)
+		@cp $(NAMETMP) $(NAME)
 		@printf $(RESET)
 
+$(NAME):	$(NAMETMP)
+
 $(NAMEB):	$(OBJB) $(LIBFT)
+		@rm -f $(NAMETMP)
 		@echo $(GREEN)"LINKING bonus objects to create $(NAME)"
 		$(CC) $(OBJB) $(CFLAGS) -L$(LIBFTDIR) -lft -o $(NAMEB)
 		@cp $(NAMEB) $(NAME)
 		@printf $(RESET)
-
-bonus:		$(NAMEB)
 
 libft:		$(LIBFT)
 		@make -sC $(LIBFTDIR)
