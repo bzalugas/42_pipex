@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/28 15:56:02 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/30 08:43:55 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,8 @@ int	run_last(t_pipes *p, char *av[], char *env[])
 	ft_close(p, p->fd[p->n_cmd % 2][0]);
 	ft_close(p, p->fd[p->n_cmd % 2][1]);
 	waitpid(pid, &wstatus, 0);
-	wait(NULL);
+	while (errno != ECHILD)
+		wait(NULL);
 	return (WEXITSTATUS(wstatus));
 }
 
