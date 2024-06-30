@@ -6,11 +6,13 @@
 #    By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/17 15:07:33 by bazaluga          #+#    #+#              #
-#    Updated: 2024/06/30 14:29:40 by bazaluga         ###   ########.fr        #
+#    Updated: 2024/06/30 15:25:31 by bazaluga         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
 NAME	    :=	pipex
+
+NAMEB	    :=	obj_bonus/pipex
 
 SRCDIR	    :=	src
 
@@ -39,7 +41,7 @@ SRC	    :=  $(addprefix $(SRCDIR)/, $(SRC))
 
 SRCB	    :=  $(addprefix $(SRCBDIR)/, $(SRCB))
 
-OBJ	    :=  $(addprefix $(OBJDIR)/, $(OBJB))
+OBJ	    :=  $(addprefix $(OBJDIR)/, $(OBJ))
 
 OBJB	    :=  $(addprefix $(OBJBDIR)/, $(OBJB))
 
@@ -54,6 +56,8 @@ GREEN	:=  "\033[1;32m"
 RESET	:=  "\033[0m"
 
 all:		$(NAME)
+
+# bonus:		$(NAMEB)
 
 $(OBJDIR):
 		mkdir -p $(OBJDIR)
@@ -81,19 +85,21 @@ $(NAME):	$(OBJ) $(LIBFT)
 		$(CC) $(OBJ) $(CFLAGS) -L$(LIBFTDIR) -lft -o $(NAME)
 		@printf $(RESET)
 
-bonus:		$(OBJB) $(LIBFT)
+$(NAMEB):	$(OBJB) $(LIBFT)
 		@echo $(GREEN)"LINKING bonus objects to create $(NAME)"
-		$(CC) $(OBJB) $(CFLAGS) -L$(LIBFTDIR) -lft -o $(NAME)
+		$(CC) $(OBJB) $(CFLAGS) -L$(LIBFTDIR) -lft -o $(NAMEB)
+		@cp $(NAMEB) $(NAME)
 		@printf $(RESET)
+
+bonus:		$(NAMEB)
 
 libft:		$(LIBFT)
 		@make -sC $(LIBFTDIR)
 
 clean:
 		@echo $(RED)"CLEANING OBJS"
-		rm -f $(OBJ)
-		rm -f $(OBJ:.o=.d)
 		rm -rf $(OBJDIR)
+		rm -rf $(OBJBDIR)
 		@make -sC $(LIBFTDIR) clean
 		@echo $(RESET)
 

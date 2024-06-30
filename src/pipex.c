@@ -6,16 +6,12 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:11:46 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/28 15:08:02 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/30 15:13:54 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/pipex.h"
 #include "../include/libft.h"
-#include <fcntl.h>
-#include <errno.h>
-#include <unistd.h>
-#include <sys/wait.h>
 
 static void	*free_broken_split(char **arr, size_t broken_idx)
 {
@@ -62,20 +58,22 @@ int	main(int ac, char *av[], char *env[])
 	t_pipes	p;
 	int		res;
 
-	p = (t_pipes){.n_cmd = 0, .fd[0][0] = -1, .fd[0][1] = -1, .fd[1][0] = -1,
-		.fd[1][1] = -1, .paths = NULL, .cmd_opts = NULL};
-	if (ac < 5)
+	p = (t_pipes){.fd[0] = -1, .fd[1] = -1, .paths = NULL, .cmd_opts = NULL,
+		.last = -1};
+	if (ac != 5)
 		stop_error("Usage: ./pipex infile cmd1 cmd2 outfile", EXIT_FAILURE, &p,
 			false);
-	if (!ft_strncmp(av[1], "here_doc", 8))
-		p.here_doc = true;
-	if (p.here_doc && ac < 6)
-		stop_perror("Usage: ./pipex here_doc delim cmd1 cmd2 outfile", EINVAL,
-			&p, false);
 	p.paths = get_paths(env);
 	if (!p.paths)
 		return (stop_error("get_paths", EXIT_FAILURE, &p, false));
-	res = run_all(&p, av, env);
-	end_pipex(&p, res, false);
+	if (pipe(p.fd) == -1)
+		stop_error("pipe error", EXIT_FAILURE, &p, true);
+	run_first(&p, av, env);
+	run_last(&p, &av[3], env);
+	ft_close(&p, p.fd[0]);
+	ft_close(&p, p.fd[1]);
+	waitpid(p.last, &res, 0);
+	wait(NULL);
+	end_pipex(&p, WEXITSTATUS(res), false);
 	return (0);
 }
