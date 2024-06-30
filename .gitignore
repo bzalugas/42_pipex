@@ -4,6 +4,7 @@
 *.a
 *~
 obj/
+obj_bonus/
 pipex
 file*
 *file
