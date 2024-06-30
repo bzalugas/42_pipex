@@ -1,13 +1,61 @@
 * Pipex
-** Steps
-- [ ] Fork
-- [ ] Check if infile can be read then open it
-- [ ] Get the path in envp, split it.
-- [ ] Redirect infile to stdin
-- [ ] Try to launch cmd1 with every path (or check with access): it will run it and stop process if the path is correct
-- [ ] Fork again
-- [ ] Check if outfile can be written to then open it
-- [ ] Do the same with cmd2 but res cmd1 in stdin
+This project aims to simulate the pipe operator in bash.
+** Quick overview
+The pipe operator is used when we need an interaction between commands. For example, the command
+#+begin_src bash
+< file1 cat | head -5 > file2
+#+end_src
+means "execute the =cat= function with the file =file1= as input then the =head= function with the result of previous command as input and output the result in the file =file2=."
+
+The pipex program is called like this:
+#+begin_src bash
+./pipex file1 cmd1 cmd2 file2
+#+end_src
+** How it works
+In order to achieve this project, we will need to use multiple processes. To create a new process, the function =fork()= is used in C. Each command is run in a new process and processes communicate thanks to pipes, created with the =pipe(fd[2])= function.
+
+For the first command, the input is =file1=. It means that we must open the file and redirect the standard input in the new process to the file descriptor of =file1=. The standard output will be redirected to the write end of the pipe (=fd[1]=).
+
+The second command will take the read end of the pipe (=fd[0]=) and the =file2= as standard output.
+** Bonus part
+There are 2 bonuses in this project.
+*** Bonus part 1
+The first bonus is about handling multiple commands as such:
+#+begin_src bash
+./pipex infile cmd1 cmd2 cmd3 ... outfile
+#+end_src
+In order to achieve that goal, I use 2 pipes one after another to provide an input and an output to each command. The difficult part is to correctly handle pipes opening and closing at the good time.
+*** Bonus part 2
+The second bonus is about handling the "here doc". Here doc operator is =<<= and allows to get an input of multiple lines until a defined delimiter is written to the input. The program must behave like the command
+#+begin_src bash
+cmd << END | cmd2 >> outfile
+#+end_src
+In this command, the first command has as input the standard input and we can write anything, including newlines, until we write "END". Our program will be called like this:
+#+begin_src bash
+./pipex here_doc DELIMITER cmd1 cmd2 outfile
+#+end_src
+
+Handling this bonus is quite easy because we just need to use our =get_next_line(fd)= function and write each line to the first input pipe until the delimiter is found.
+*** Program sequence with all bonuses
+To handle all the bonuses, here are the most important parts of  my program sequence:
+1. If the input is the here_doc, create a first pipe (that we will call pipe_in) and get the stdin with =get_next_line= and write lines to the pipe
+2. Create a pipe for the output (pipe_out)
+3. Create a new process (the first)
+   1. In this new process, if the input is a file, then open it
+   2. Redirect *stdin* to the *pipe_in* or *the infile*
+   3. Redirect *stdout* to the *pipe_out*
+   4. Run the command
+4. For all the commands before the last:
+   1. Close the last pipe_in
+   2. Create a new pipe as pipe_out
+   3. Create a new process in which *stdin* is redirected to *pipe_in* and *stdout* to *pipe_out* then run the command
+5. For the last command:
+   1. Close the last pipe_in
+   2. Open the outfile
+   3. Create a new process in wich *stdin* is redirected to *pipe_in* and *stdout* to *outfile*
+6. Exit the programm with the last process exit code.
+
+To run a command, =execve()= is used. This function needs the absolute path to the command, the list of the options provided with the command (as an array of strings) and the environment array. Since the commands can be written without their absolute path, we need to find it. In order to do that, We need to find the *path variable* in the *env* array and try to run execve with it. If the function returns anything, it means it failed so we try with the next path until the function succeeds.
 * Time spent
 ** IN PROGRESS Pipex
 :PROPERTIES:
