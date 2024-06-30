@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/30 08:43:55 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/06/30 09:44:32 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ int	run_middle(t_pipes *p, char *av[], char *env[])
 	i = 3 + p->here_doc;
 	while (av[i] && av[i + 1] && av[i + 2])
 	{
-		if (pipe(p->fd[(p->n_cmd - 1) % 2]) == -1)
+		if (pipe(p->fd[(p->n_cmd + 1) % 2]) == -1)
 			stop_error("pipe", EXIT_FAILURE, p, true);
 		pid = fork();
 		if (pid == -1)
@@ -111,7 +111,7 @@ int	run_middle(t_pipes *p, char *av[], char *env[])
 		if (pid == 0)
 		{
 			ft_close(p, p->fd[p->n_cmd % 2][1]);
-			ft_close(p, p->fd[(p->n_cmd - 1) % 2][0]);
+			ft_close(p, p->fd[(p->n_cmd + 1) % 2][0]);
 			p->cmd_opts = ft_split(av[i], ' ');
 			if (!p->cmd_opts)
 				stop_error("split", EXIT_FAILURE, p, true);
