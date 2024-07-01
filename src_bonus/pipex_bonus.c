@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/30 14:35:22 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/30 14:35:28 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/07/01 18:35:30 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ int	main(int ac, char *av[], char *env[])
 	if (ac < 5)
 		stop_error("Usage: ./pipex infile cmd1 cmd2 outfile", EXIT_FAILURE, &p,
 			false);
+	p.prog_name = ft_strjoin(av[0], ": ");
 	if (!ft_strncmp(av[1], "here_doc", 8))
 		p.here_doc = true;
 	if (p.here_doc && ac < 6)

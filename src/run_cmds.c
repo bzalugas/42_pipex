@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/30 15:01:10 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/07/01 18:37:38 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static int	run_cmd(t_pipes *p, char *cmd[], char *env[])
 	ft_close(p, p->fd_out);
 	if (cmd[0][0] == '/' || (cmd[0][0] == '.' && cmd[0][1] == '/'))
 		if (execve(cmd[0], cmd, env))
-			stop_error(cmd[0], 127, p, 1);
+			stop_perror(cmd[0], 0, p, 1);
 	i = 0;
 	while (p->paths[i])
 	{

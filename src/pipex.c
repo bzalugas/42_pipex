@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:11:46 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/07/01 16:28:33 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/07/01 18:17:00 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ int	main(int ac, char *av[], char *env[])
 	if (ac != 5)
 		stop_error("Usage: ./pipex infile cmd1 cmd2 outfile", EXIT_FAILURE, &p,
 			false);
+	p.prog_name = ft_strjoin(av[0], ": ");
 	p.paths = get_paths(env);
 	if (!p.paths)
 		return (stop_error("get_paths", EXIT_FAILURE, &p, false));
