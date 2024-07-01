@@ -6,6 +6,8 @@
 obj/
 obj_bonus/
 pipex
-file*
-*file
+infile
+outfile
+file1
+file2
 pipex-tester/
