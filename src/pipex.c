@@ -6,12 +6,13 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:11:46 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/30 15:13:54 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/07/01 16:28:33 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/pipex.h"
 #include "../include/libft.h"
+#include <sys/wait.h>
 
 static void	*free_broken_split(char **arr, size_t broken_idx)
 {
