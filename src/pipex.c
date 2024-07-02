@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 15:11:46 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/07/01 18:17:00 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/07/02 11:50:03 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,6 @@ int	main(int ac, char *av[], char *env[])
 			false);
 	p.prog_name = ft_strjoin(av[0], ": ");
 	p.paths = get_paths(env);
-	if (!p.paths)
-		return (stop_error("get_paths", EXIT_FAILURE, &p, false));
 	if (pipe(p.fd) == -1)
 		stop_error("pipe error", EXIT_FAILURE, &p, true);
 	run_first(&p, av, env);

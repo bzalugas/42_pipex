@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 19:24:34 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/07/01 18:37:38 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/07/02 11:48:32 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ static int	run_cmd(t_pipes *p, char *cmd[], char *env[])
 		if (execve(cmd[0], cmd, env))
 			stop_perror(cmd[0], 0, p, 1);
 	i = 0;
-	while (p->paths[i])
+	while (p->paths && p->paths[i])
 	{
 		abs_cmd = ft_strjoin(p->paths[i], cmd[0]);
 		execve(abs_cmd, cmd, env);
