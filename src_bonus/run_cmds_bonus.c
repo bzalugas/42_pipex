@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/30 14:35:31 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/07/01 18:37:05 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/07/03 19:12:18 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int	run_cmd(t_pipes *p, char *cmd[], char *env[])
 	dup2(fd_out, STDOUT_FILENO);
 	ft_close(p, fd_in);
 	ft_close(p, fd_out);
-	if (cmd[0][0] == '/' || (cmd[0][0] == '.' && cmd[0][1] == '/'))
+	if (ft_strchr(cmd[0], '/'))
 		if (execve(cmd[0], cmd, env))
 			stop_perror(cmd[0], 0, p, 1);
 	i = 0;
