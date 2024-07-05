@@ -6,7 +6,7 @@
 /*   By: bazaluga <bazaluga@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/30 14:33:17 by bazaluga          #+#    #+#             */
-/*   Updated: 2024/06/30 14:34:19 by bazaluga         ###   ########.fr       */
+/*   Updated: 2024/07/05 10:40:10 by bazaluga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,15 +20,14 @@ int	get_here_doc(t_pipes *p, char *av[])
 	char	*line;
 	char	*lim;
 
+	lim = ft_strjoin(av[2], "\n");
 	line = get_next_line(STDIN_FILENO);
 	while (line)
 	{
-		lim = ft_strnstr(line, av[2], ft_strlen(line));
-		if (lim)
+		if (!ft_strncmp(lim, line, ft_strlen(line)))
 		{
-			if (line != lim)
-				write(p->fd[0][1], line, lim - line);
 			free(line);
+			free(lim);
 			close(p->fd[0][1]);
 			return (0);
 		}
